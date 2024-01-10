@@ -30,31 +30,14 @@ def run_eval(args) :
       # format prompts using passage and evidence
       prompts = [INPUT.format_map({"evidence":input["evidence"], "output":input["passage"]}) for input in inputs]
       # populate edited outputs
-      if args.use_vllm:
-        model = vllm.LLM(model=args.model_name_or_path)
-        sampling_params = vllm.SamplingParams(
+
+      model = vllm.LLM(model=args.model_name_or_path)
+      sampling_params = vllm.SamplingParams(
           temperature=args.temperature if args.do_sample else 0,
           top_p=args.top_p,
           max_tokens=args.max_new_tokens,
         )
-        outputs = model.generate(prompts, sampling_params)
-      else:
-        model, tokenizer = load_hf_lm_and_tokenizer(
-          model_name_or_path=args.model_name_or_path,
-          tokenizer_name_or_path=args.model_name_or_path,
-          load_in_8bit=args.load_in_8bit,
-          device_map="balanced_low_0" if torch.cuda.device_count() > 1 else "auto",
-        )
-        outputs = generate_completions(
-          model=model,
-          tokenizer=tokenizer,
-          prompts=prompts,
-          batch_size=args.batch_size,
-          max_new_tokens=args.max_new_tokens,
-          do_sample=args.do_sample,
-          temperature=args.temperature,
-          top_p=args.top_p,
-        )
+      outputs = model.generate(prompts, sampling_params)
       
     if args.metric == 'factscore':
       fs = FactScorer(model_name="retrieval+ChatGPT", openai_key=args.openai_key)
@@ -123,19 +106,6 @@ def parse_args():
         type=str,
         default=None,
         help="OpenAI key for factscore.")
-    parser.add_argument(
-        "--batch_size",
-        type=int,
-        default=1)
-    parser.add_argument(
-        "--load_in_8bit",
-        action="store_true")
-    parser.add_argument(
-        "--load_in_float16",
-        action="store_true")
-    parser.add_argument(
-        "--use_vllm",
-        action="store_true")
   parser.add_argument(
         "--max_new_tokens",
         type=int,
