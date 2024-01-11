@@ -63,7 +63,7 @@ def run_eval(args) :
         gold_passages = load_jsonlines(args.gold_annotations_file)
         error_types = ["<entity>", "<relation>", "<contradictory>", "<unverifiable>", "<invented>", "<subjective>"]
         pred_sentences = split_sentences(outputs[i])
-        gold_sentences = split_sentences(gold_passages[i])
+        gold_sentences = split_sentences(gold_passages[i]["passage"])
         sentences = min(len(pred_sentences), len(gold_sentences))
         new_inputs = run_detection(gold_sentences[0:sentences], pred_sentences[0:sentences], inputs, i)
         inputs = new_inputs
