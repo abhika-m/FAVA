@@ -37,7 +37,18 @@ def remove_error_tags(token_passage):
 
     token_passage = token_passage.replace("</s>", "")
     return token_passage
-
+    
+def swap_error_tags(token_passage):
+    token_passage = token_passage.replace("<mark>", "<d>")
+    token_passage = token_passage.replace("</mark>", "</d>")
+    token_passage = token_passage.replace("<delete>", "<mark>")
+    token_passage = token_passage.replace("</delete>", "</mark>")
+    token_passage = token_passage.replace("<d>", "<delete>")
+    token_passage = token_passage.replace("</d>", "</delete>")
+    print(token_passage)
+    token_passage = token_passage.replace("</s>", "")
+    return token_passage
+    
 def run_detection(gold_sentences, pred_sentences, inputs, i) :
   for idx, (s_g, s_p) in enumerate(zip(gold_sentences, pred_sentences)):
     results_rec.setdefault(idx, {}) 
