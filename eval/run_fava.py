@@ -4,7 +4,7 @@ import os
 import numpy as np
 import vllm
 import torch
-from utils import load_jsonlines
+from ..utils import load_jsonlines
 
 # Fava prompt
 INPUT = "Read the following references:\n{evidence}\nPlease identify all the errors in the following text using the information in the references provided and suggest edits if necessary:\n[Text] {output}\n[Edited] "
