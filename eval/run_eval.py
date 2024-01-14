@@ -11,7 +11,7 @@ import argparse
 import vllm
 import spacy
 nlp = spacy.load("en_core_web_sm")
-from utils import remove_error_tags, load_jsonlines, split_sentences, run_detections
+from ..utils import remove_error_tags, load_jsonlines, split_sentences, run_detections
 
 # Fava prompt formats
 INPUT = "Read the following references:\n{evidence}\nPlease identify all the errors in the following text using the information in the references provided and suggest edits if necessary:\n[Text] {output}\n[Edited] "
