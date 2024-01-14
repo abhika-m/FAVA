@@ -4,7 +4,7 @@ import backoff
 import random
 import time
 import argparse
-from utils import swap_error_tags, remove_error_tags
+from ..utils import swap_error_tags, remove_error_tags
 
 @backoff.on_exception(backoff.expo, openai.error.ServiceUnavailableError)
 def completions_with_backoff(**kwargs):
