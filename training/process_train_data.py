@@ -25,7 +25,7 @@ def process(file, output_file):
     evidences = []
     if "ctxs" in d:
       for c in d["ctxs"]:
-        evidences.append(c)
+        evidences.append(c["text"])
     if "evidence" in d:
       evidences.append(d["evidence"])
     
