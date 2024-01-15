@@ -16,8 +16,6 @@ from ..utils import remove_error_tags, load_jsonlines, split_sentences, run_dete
 
 # Fava prompt formats
 INPUT = "Read the following references:\n{evidence}\nPlease identify all the errors in the following text using the information in the references provided and suggest edits if necessary:\n[Text] {output}\n[Edited] "
-QA = "Read the following references:\n{evidence}\nPlease identify all the errors in the following text using the information in the references provided and suggest edits:\n[Text] Question: {question} Answer: {output}\n[Edited] "
-
 
 def run_eval(args):
     # create output path
@@ -111,13 +109,7 @@ def parse_args():
         "--input_file",
         type=str,
         default=None,
-        help="Input .jsonl files containing input passages and references and/or titles if using factscore.",
-    )
-    parser.add_argument(
-        "--gold_annotations_file",
-        type=str,
-        default=None,
-        help="Input .jsonl files containing annotated passages and references for detection task.",
+        help="Input .json files containing input passages and references and/or titles if using factscore.",
     )
     parser.add_argument(
         "--output_file",
