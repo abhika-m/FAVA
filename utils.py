@@ -45,6 +45,8 @@ def swap_error_tags(token_passage):
     token_passage = token_passage.replace("</delete>", "</mark>")
     token_passage = token_passage.replace("<d>", "<delete>")
     token_passage = token_passage.replace("</d>", "</delete>")
+    token_passage = token_passage.replace("<contradictory>", "<contradictory><delete>")
+    token_passage = token_passage.replace("</contradictory>", "</delete><contradictory>")
     print(token_passage)
     token_passage = token_passage.replace("</s>", "")
     return token_passage
