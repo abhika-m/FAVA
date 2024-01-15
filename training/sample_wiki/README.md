@@ -17,7 +17,7 @@ wget https://dumps.wikimedia.org/enwiki/20230101/enwiki-20230101-pages-articles-
 ```
 
 ### Extract data
-Once download the dump data, you need to extract the article data. I recommend using [wikiextractor](https://github.com/attardi/wikiextractor)
+Once dump data is downloaded, the article data needs to be extracted. [wikiextractor](https://github.com/attardi/wikiextractor) is recommended.
 
 ```
 git clone https://github.com/attardi/wikiextractor.git
