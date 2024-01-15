@@ -77,7 +77,7 @@ You can find our training data [here](https://huggingface.co/datasets/fava-uw/fa
 ## Retrieval Guide
 We use [Contriever](https://github.com/facebookresearch/contriever) to retrieve documents.
 
-### Download data
+### Step 1: Download data
 Download the preprocessed passage data and the generated passaged ([Contriever-MSMARCO](https://huggingface.co/facebook/contriever-msmarco)). 
 ```
 cd retrieval
@@ -85,7 +85,7 @@ wget https://dl.fbaipublicfiles.com/dpr/wikipedia_split/psgs_w100.tsv.gz
 wget https://dl.fbaipublicfiles.com/contriever/embeddings/contriever-msmarco/wikipedia_embeddings.tar
 ```
 
-### Collect Retrieved Passages
+### Step 2: Collect Retrieved Passages
 
 We retrieve the top 5 documents but you may adjust `num_docs` as per your liking.
 ```
