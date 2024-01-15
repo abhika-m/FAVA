@@ -15,41 +15,34 @@ python -m spacy download en_core_web_sm
 
 Our synthetic data generation takes in wikipedia passages and a title, diversifies the passage to another genre of text and then inserts errors one by one using ChatGPT and GPT-4.
 
-#### Input Data Format
-The input data should be a .jsonl file including "intro" and "title" where "intro" is the introduction of a sampled Wikipedia passage and "title" is the topic of the passage.
-
-#### Output Data Format
-The output data of the data generation script will be a .json file including the original passage as "evidence", the diversified text as "diversified_passage", the passage with inserted errors as "errored_passage", the subject of the passage as "subject", the genre of text diversification as "type", and the different error types inserted as "error_types".
-
 #### Running Data Generation
 ```bash
 cd training
 python generate_train_data.py --input_file {input_file_path} --output_file {output_file_path} --openai_key {your_openai_key}
 ```
 
+Input File Example: `{"intro": "Lionel Messi is an Argentine soccer player.", "title": "Lionel Andrés Messi"}, ...`
+
+Output File Example: `{"evidence": "Lionel Messi is an Argentine soccer player.", "diversified_passage": "The Argentine soccer player, Lionel Messi was...", "errored_passage": "The <entity><delete>Argentine</delete><mark>American</mark></entity> soccer player...", "subject": "Lionel Andrés Messi", "type": "news article", "error_types": ["entity"]}, ...`
+
 ### Step 2: Process Training Data
-
-#### Input Data Format
-The input data should be a .json file including "errored_passage" as the passage with inserted errors and "evidence" as the base wikipedia article from step 1. This file can also include "ctxs" as additional evidence passages. 
-
-#### Output Data Format
-The output data of the data generation script will be a .json file with "prompt" and "completion" as the set up for training.
 
 #### Running Data Generation
 ```bash
 cd training
 python process_train_data.py --input_file {input_file_path} --output_file {output_file_path}
 ```
+
+Input File Example: `{"evidence": "Lionel Messi is an Argentine soccer player.", "errored_passage": "The <entity><delete>Argentine</delete><mark>American</mark></entity> soccer player...", "ctxs":["Lio Messi...", "Argentine player...",...]},...`
+
+Ouput File Example: `{"prompt": "Read the following references:\nReference[1]:...[Text] The American soccer player...", "completion": "The <entity><mark>Argentine</mark><delete>American</delete></entity> soccer player..."}, ...`
+
 ### Step 3: Training
 We followed [Open-Instruct's](https://github.com/allenai/open-instruct) training script for training FAVA. We updated and ran [this script](https://github.com/allenai/open-instruct/blob/main/scripts/finetune_with_accelerate.sh) updating the train_file to our processed training data from step 2 and used Llama-2-Chat 7B as our base model.
 
 ## Running Evals
 
 We provide two main evaluation set ups: FActScore and our own fine grained error detection task. 
-
-### Input Data Format
-
-To run either evaluation system, you must have an input json file with "output" and "evidence" fields. To run FActScore, you must also have a "title" field for each instance. To run the detection task, you must additionally have a "annotated" field with the gold edits.
 
 ### FActScore
 ```bash
