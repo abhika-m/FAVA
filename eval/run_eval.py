@@ -33,7 +33,7 @@ def run_eval(args):
                 evidences = []
                 if "ctxs" in input:
                     for c in input["ctxs"]:
-                        evidences.append(c)
+                        evidences.append(c["text"])
                 if "evidence" in input:
                     evidences.append(input["evidence"])
 
