@@ -2,6 +2,10 @@
 
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-red.svg)](#python)
 
+## Intro
+
+FAVA is a hallucination detection and editing model. You can find a model demo [here](https://huggingface.co/spaces/fava-uw/fava), model weights [here](https://huggingface.co/fava-uw/fava-model) and our datasets [here](https://huggingface.co/datasets/fava-uw/fava-data).
+
 ## Install
 ```
 conda create -n fava python=3.9
