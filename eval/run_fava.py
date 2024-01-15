@@ -9,32 +9,18 @@ from ..utils import load_jsonlines
 # Fava prompt
 INPUT = "Read the following references:\n{evidence}\nPlease identify all the errors in the following text using the information in the references provided and suggest edits if necessary:\n[Text] {output}\n[Edited] "
 
-def parse_args():
-  parser = argparse.ArgumentParser()
-  parser.add_argument(
-      "--model_name_or_path",
-      type=str,
-      default=None,
-      help="Huggingface model name or path.")
-  parser.add_argument(
-      "--input_file",
-      type=str,
-      default=None,
-      help="Input .jsonl files containing passage and reference.")
-  args = parser.parse_args()
-  return args
-
 if __name__ == "__main__":
-  args = parse_args()
-  model = vllm.LLM(model=args.model_name_or_path)
-  sampling_params = vllm.SamplingParams(
-    temperature=args.temperature if args.do_sample else 0,
-    top_p=args.top_p,
-    max_tokens=args.max_new_tokens,
-  )
-  outputs = model.generate(prompts, sampling_params)
-  outputs = [it.outputs[0].text for it in outputs]
-  print(outputs[0])
-
-  
-
+    args = parse_args()
+    
+    model = vllm.LLM(model="fava-uw/fava-model")
+    sampling_params = vllm.SamplingParams(
+        temperature=0,
+        top_p=1.0,
+        max_tokens=1024,
+    )
+    output = "" # add your passage to verify
+    evidence = "" # add a piece of evidence
+    prompts = [INPUT.format_map({"evidence": evidence, "output": output})]
+    outputs = model.generate(prompts, sampling_params)
+    outputs = [it.outputs[0].text for it in outputs]
+    print(outputs[0])
