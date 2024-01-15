@@ -10,8 +10,9 @@ FAVA is a hallucination detection and editing model. You can find a model demo [
 1. [Installation](#install)
 2. [Synthetic Data Generation](#step-1-synthetic-data-generation) 
 3. [Postprocess Data for Training](#step-2-process-training-data)
-4. [FActScore Evaluations](#factscore)
-5. [Fine Grained Sentence Detection Evaluations](#fine-grained-sentence-detection)
+4. [Retrieval Guide](#retrieval-guide)
+5. [FActScore Evaluations](#factscore)
+6. [Fine Grained Sentence Detection Evaluations](#fine-grained-sentence-detection)
 
 ## Install
 ```
@@ -29,47 +30,103 @@ Our synthetic data generation takes in wikipedia passages and a title, diversifi
 #### Running Data Generation
 ```bash
 cd training
-python generate_train_data.py --input_file {input_file_path} --output_file {output_file_path} --openai_key {your_openai_key}
+python generate_train_data.py \
+--input_file {input_file_path} \
+--output_file {output_file_path} \
+--openai_key {your_openai_key}
 ```
+Input file is `jsonl` and includes:
+- `intro` (ex: 'Lionel Messi is an Argentine soccer player.')
+- `title` (ex: 'Lionel Andrés Messi')
 
-Input File Example: `{"intro": "Lionel Messi is an Argentine soccer player.", "title": "Lionel Andrés Messi"}, ...`
+Output file includes:
+- `evidence` (ex: 'Lionel Messi is an Argentine soccer player.')
+- `diversified_passage` (ex: 'The Argentine soccer player, Lionel Messi, is...')
+- `errored_passage` (ex: 'The \<entity>\<delete>Argentine\</delete>\<mark>American\</mark>\</entity> soccer player, Lionel Messi, is...')
+- `subject` (ex: 'Lionel Andrés Messi')
+- `type` (ex: 'News Article')
+- `error_types` (ex: ['entity'])
 
-Output File Example: `{"evidence": "Lionel Messi is an Argentine soccer player.", "diversified_passage": "The Argentine soccer player, Lionel Messi was...", "errored_passage": "The <entity><delete>Argentine</delete><mark>American</mark></entity> soccer player...", "subject": "Lionel Andrés Messi", "type": "news article", "error_types": ["entity"]}, ...`
 
 ### Step 2: Process Training Data
 
 #### Post Processing
 ```bash
 cd training
-python process_train_data.py --input_file {input_file_path} --output_file {output_file_path}
+python process_train_data.py \
+--input_file {input_file_path} \
+--output_file {output_file_path}
 ```
 
-Input File Example: `{"evidence": "Lionel Messi is an Argentine soccer player.", "errored_passage": "The <entity><delete>Argentine</delete><mark>American</mark></entity> soccer player...", "ctxs":["Lio Messi...", "Argentine player...",...]},...`
+Input file is `json` and includes:
+- `evidence` (ex: 'Lionel Messi is an Argentine soccer player.')
+- `errored_passage` (ex: 'The \<entity>\<delete>Argentine\</delete>\<mark>American\</mark>\</entity> soccer player, Lionel Messi, is...')
+- `ctxs` (ex: [{'id': 0, 'title': 'Lionel Messi', 'text': 'Lio Messi is known for...'},...])
 
-Ouput File Example: `{"prompt": "Read the following references:\nReference[1]:...[Text] The American soccer player...", "completion": "The <entity><mark>Argentine</mark><delete>American</delete></entity> soccer player..."}, ...`
+Output file includes:
+- `prompt` (ex: 'Read the following references:\nReference[1]:Lio Messi is...[Text] The American soccer player, Lionel Messi, is...')
+- `completion` (ex: 'The \<entity>\<mark>Argentine\</mark>\<delete>American\</delete>\</entity> soccer player, Lionel Messi, is...')
 
 ### Step 3: Training
 We followed [Open-Instruct's](https://github.com/allenai/open-instruct) training script for training FAVA. We updated and ran [this script](https://github.com/allenai/open-instruct/blob/main/scripts/finetune_with_accelerate.sh) updating the train_file to our processed training data from step 2 and used Llama-2-Chat 7B as our base model.
 
-## Running Evals
+You can find our training data [here](https://huggingface.co/datasets/fava-uw/fava-data/blob/main/training.json).
+
+## Retrieval Guide
+We use [Contriever](https://github.com/facebookresearch/contriever) to retrieve documents.
+
+### Download data
+Download the preprocessed passage data and the generated passaged ([Contriever-MSMARCO](https://huggingface.co/facebook/contriever-msmarco)). 
+```
+cd retrieval
+wget https://dl.fbaipublicfiles.com/dpr/wikipedia_split/psgs_w100.tsv.gz
+wget https://dl.fbaipublicfiles.com/contriever/embeddings/contriever-msmarco/wikipedia_embeddings.tar
+```
+
+### Collect Retrieved Passages
+
+We retrieve the top 5 documents but you may adjust `num_docs` as per your liking.
+```
+cd retrieval
+python passage_retrieval.py \
+    --model_name_or_path facebook/contriever-msmarco --passages psgs_w100.tsv \
+    --passages_embeddings "wikipedia_embeddings/*" \
+    --data {input_file_path}  \
+    --output_dir {output_file_path} \
+    --n_docs {num_docs}
+```
+
+Input file is either a `json` or `jsonl` and includes:
+- `question` or `instruction` (ex: 'Who is Lionel Messi')
+
+
+## Evaluations
 
 We provide two main evaluation set ups: FActScore and our own fine grained error detection task. 
 
 ### FActScore
 ```bash
 cd eval
-python run_eval --model_name_or_path {model_name_or_path} --input_file {input_passages_references_titles} --output_file {output_file_path} --metric factscore --openai_key {your_openai_key}
+python run_eval --model_name_or_path {model_name_or_path} --input_file {input_file_path} --output_file {output_file_path} --metric factscore --openai_key {your_openai_key}
 ```
 
-Input File Example: `{"passage": "Lionel Andrés Messi, also known as Leo Messi, is an American professional footballer who plays as a forward.", "reference": "Lionel Messi is an Argentine soccer player.", "title": "Lionel Messi"}, ...`
+Input file is `json` and includes:
+- `passage` (ex: 'The American soccer player, Lionel Messi, is...')
+- `evidence` (ex: 'Lionel Messi is an Argentine soccer player...')
+- `title` (ex: 'Lionel Messi')
 
 ### Fine Grained Sentence Detection
 ```bash
 cd eval
-python run_eval --model_name_or_path {model_name_or_path} --input_file {input_passages_references_titles} --output_file {output_file_path} --metric detection
+python run_eval --model_name_or_path {model_name_or_path} --input_file {input_file_path} --output_file {output_file_path} --metric detection
 ```
+Input file is `json` and includes:
+- `passage` (ex: 'The American soccer player, Lionel Messi, is...')
+- `evidence` (ex: 'Lionel Messi is an Argentine soccer player...')
+- `annotated` (ex: 'The \<entity>\<mark>Argentine\</mark>\<delete>American\</delete>\</entity> soccer player, Lionel Messi, is...')
 
-Input File Example: `{"passage": "Lionel Andrés Messi, also known as Leo Messi, is an American professional footballer who plays as a forward.", "reference": "Lionel Messi is an Argentine soccer player.", "annotated": "Lionel Andrés Messi, also known as Leo Messi, is an <entity><delete>American</delete><mark>Argentine</mark></entity> professional footballer who plays as a forward}", ...`
+
+You can find our human annotation data [here](https://huggingface.co/datasets/fava-uw/fava-data/blob/main/annotations.json).
 
 **Optional flags**:
 - `--max_new_tokens`: max new tokens to generate
