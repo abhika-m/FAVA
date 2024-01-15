@@ -4,7 +4,14 @@
 
 ## Intro
 
-FAVA is a hallucination detection and editing model. You can find a model demo [here](https://huggingface.co/spaces/fava-uw/fava), model weights [here](https://huggingface.co/fava-uw/fava-model) and our datasets [here](https://huggingface.co/datasets/fava-uw/fava-data).
+FAVA is a hallucination detection and editing model. You can find a model demo [here](https://huggingface.co/spaces/fava-uw/fava), model weights [here](https://huggingface.co/fava-uw/fava-model) and our datasets [here](https://huggingface.co/datasets/fava-uw/fava-data). This repo includes information on synthetic data generation for training and evaluating FAVA.
+
+## Overview 
+1. [Installation](#install)
+2. [Synthetic Data Generation](#step-1-synthetic-data-generation) 
+3. [Postprocess Data for Training](#step-2-process-training-data)
+4. [FActScore Evaluations](#factscore)
+5. [Fine Grained Sentence Detection Evaluations](#fine-grained-sentence-detection)
 
 ## Install
 ```
@@ -31,7 +38,7 @@ Output File Example: `{"evidence": "Lionel Messi is an Argentine soccer player."
 
 ### Step 2: Process Training Data
 
-#### Running Data Generation
+#### Post Processing
 ```bash
 cd training
 python process_train_data.py --input_file {input_file_path} --output_file {output_file_path}
