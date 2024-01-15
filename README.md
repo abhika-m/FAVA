@@ -117,6 +117,8 @@ Input file is `json` and includes:
 - `evidence` (ex: 'Lionel Messi is an Argentine soccer player...')
 - `title` (ex: 'Lionel Messi')
 
+[FActScore](https://github.com/shmsw25/FActScore) dataset can be downloaded from [here](https://github.com/shmsw25/FActScore?tab=readme-ov-file#download-the-data). We used the the Alpaca 7B, Alpaca 13B, and ChatGPT data from FActScore.
+
 ### Fine Grained Sentence Detection
 ```bash
 cd eval
