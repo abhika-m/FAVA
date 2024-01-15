@@ -4,7 +4,6 @@ import backoff
 import random
 import time
 import argparse
-from ..utils import swap_error_tags, remove_error_tags
 
 @backoff.on_exception(backoff.expo, openai.error.ServiceUnavailableError)
 def completions_with_backoff(**kwargs):
@@ -351,7 +350,6 @@ def create_passage(file, output_file):
                     max_tokens=2000)
             cost += ((response.usage.total_tokens / 1000) * 0.002)
             passage = response.choices[0].message.content
-            errors = {}
             types = []
             curr_passage = passage
             num = random.randint(0, 1)
@@ -362,7 +360,6 @@ def create_passage(file, output_file):
                     print(e)
                     time.sleep(60)
                     [r, u] = create_entity(curr_passage)
-                errors["entity"] = r
                 curr_passage = r
                 types.append("entity")
                 cost += ((u / 1000) * 0.002)
@@ -374,7 +371,6 @@ def create_passage(file, output_file):
                     print(e)
                     time.sleep(60)
                     [r, u] = create_relation(curr_passage)
-                errors["relation"] = r
                 curr_passage = r
                 types.append("relation")
                 cost += ((u / 1000) * 0.002)
@@ -383,33 +379,28 @@ def create_passage(file, output_file):
             if(num == 1):
                 [r, u] = create_invented(curr_passage, title)
                 curr_passage = r
-                errors["invented"] = r
                 types.append("invented")
                 cost += ((u / 1000) * 0.06)
             num = random.randint(0, 1)
             if(num == 1):
                 [r, u] = create_subjective(curr_passage, title)
                 curr_passage = r
-                errors["subjective"] = r
                 types.append("subjective")
                 cost += ((u / 1000) * 0.002)
             num = random.randint(0, 1)
             if(num == 1):
                 [r, u] = create_unverifiable(curr_passage, reference)
                 curr_passage = r
-                errors["unverifiable"] = r
                 types.append("unverifiable")
                 cost += ((u / 1000) * 0.06)
             num = random.randint(0, 1)
             if(num == 1):
                 [r, u] = create_contradictory(curr_passage, reference)
                 curr_passage = r
-                errors["contradictory"] = r
                 types.append("contradictory")
                 cost += ((u / 1000) * 0.002)
-            dict = {"error_history":errors,
-                    "error_types":types, "reference_passage":reference, "generated_passage":passage, "final_passage":curr_passage,
-                    "subject":title, "source":name, "type": type}
+            dict = {"evidence":reference, "diversified_passage":passage, "errored_passage":curr_passage,
+                    "subject":title, "source":name, "type": type, "error_types":types}
             data.append(dict)
             
             # increment iterations
