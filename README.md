@@ -6,6 +6,8 @@
 
 FAVA is a hallucination detection and editing model. You can find a model demo [here](https://huggingface.co/spaces/fava-uw/fava), model weights [here](https://huggingface.co/fava-uw/fava-model) and our datasets [here](https://huggingface.co/datasets/fava-uw/fava-data). This repo includes information on synthetic data generation for training and evaluating FAVA.
 
+<p align="center"><img src="https://github.com/abhika-m/FAVA/blob/main/fava.png" alt="FAVA" width="500"/></p>
+
 ## Overview 
 1. [Installation](#install)
 2. [Synthetic Data Generation](#step-1-synthetic-data-generation) 
