@@ -145,6 +145,6 @@ You can find our human annotation data [here](https://huggingface.co/datasets/fa
     title={ Fine-grained Hallucination Detection and Editing For Language Models },
     author={ Mishra, Abhika and Asai, Akari and Balachandran, Vidhisha and Wang, Yizhong and Neubig, Graham and Tsvetkov, Yulia and Hajishirzi, Hannaneh },
     year={ 2024 },
-    url={ https://arxiv.org/abs/ }
+    url={ https://arxiv.org/abs/2401.06855 }
 }
 ```
