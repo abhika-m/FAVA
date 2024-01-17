@@ -141,9 +141,10 @@ You can find our human annotation data [here](https://huggingface.co/datasets/fa
 ## Citation
 
 ```bibitex
-@inproceedings{fava,
-    title={ Fine-grained Hallucination Detection and Editing For Language Models },
+@article{mishra2024finegrained,
+    title={ Fine-grained Hallucinations Detections },
     author={ Mishra, Abhika and Asai, Akari and Balachandran, Vidhisha and Wang, Yizhong and Neubig, Graham and Tsvetkov, Yulia and Hajishirzi, Hannaneh },
+    journal={arXiv preprint},
     year={ 2024 },
     url={ https://arxiv.org/abs/2401.06855 }
 }
